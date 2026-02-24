@@ -1,0 +1,42 @@
+{
+    "version": 6,
+    "configurePresets": [
+
+        {
+            "name": "linux-release",
+            "displayName": "Linux-Release",
+            "generator": "Ninja",
+            "binaryDir": "build-linux-release",
+            "cacheVariables": {
+                "CMAKE_PREFIX_PATH": "/home/sead/projects/homey-perception/external",
+                "CMAKE_MAKE_PROGRAM": "/usr/bin/ninja"
+            },
+            "toolchainFile": ""
+        },
+        {
+            "name": "linux-debug",
+            "displayName": "Linux-Debug",
+            "generator": "Ninja",
+            "binaryDir": "build-linux-debug",
+            "cacheVariables": {
+                "CMAKE_PREFIX_PATH": "/home/sead/projects/homey-perception/external",
+                "CMAKE_BUILD_TYPE": "Debug",
+                "DISABLE_CLANG_TIDY": "ON",
+                "CMAKE_MAKE_PROGRAM": "/usr/bin/ninja"
+            },
+            "toolchainFile": ""
+        }
+    ],
+
+    "buildPresets": [
+        {
+            "name": "linux-release",
+            "configurePreset": "linux-release"
+        },
+        {
+            "name": "linux-debug",
+            "configurePreset": "linux-debug"
+        }
+
+    ]
+}
