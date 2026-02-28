@@ -4,6 +4,13 @@ add_executable(homey-perception
         main.cpp
         FrameProvider.cpp
         FrameProvider.h
+        Provider.h
+        Consumer.h
+        VisualizePipeline.cpp
+        VisualizePipeline.h
+        types.h
 )
 
-target_link_libraries(homey-perception PRIVATE opencv_core realsense2)
+target_link_libraries(homey-perception PRIVATE
+        ${OpenCV_LIBS}
+        realsense2 )
