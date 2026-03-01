@@ -19,14 +19,14 @@ namespace homey {
  * @brief Consumes frames from FrameProvider and passes them to
  *        render queue for main thread to visualize
  */
-class VisualizePipeline : public Consumer<rs2::video_frame> {
+class VisualizePipeline : public Consumer<FrameBundle> {
 
     ApplicationContext& ctx_;
 
 public:
 
     explicit VisualizePipeline(ApplicationContext& render_context);
-    void update(const rs2::video_frame& frame) override;
+    void update(const FrameBundle& frame_bundle) override;
 
 };
 

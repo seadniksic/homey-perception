@@ -5,7 +5,6 @@
 
 #include "MLPipeline.h"
 
-
 namespace homey {
 
 MLPipeline::MLPipeline(ApplicationContext& app_ctx)
@@ -19,7 +18,7 @@ MLPipeline::~MLPipeline() {
    pipeline_.join();
 }
 
-void MLPipeline::update(const rs2::video_frame& frame) {
+void MLPipeline::update(const FrameBundle& frame_bundle) {
    // do update shit
 
 }

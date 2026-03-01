@@ -14,10 +14,6 @@
 #include <thread>
 
 // fwd declare rs2 types
-namespace rs2 {
-class video_frame;
-}
-
 namespace homey {
 
 /**
@@ -28,16 +24,16 @@ namespace homey {
  * consumers.
  *
  */
-class FrameProvider : Provider<rs2::video_frame>, Manager {
+class FrameProvider : Provider<FrameBundle>, Manager {
 
-    std::vector<Consumer<rs2::video_frame>*> consumers_;
+    std::vector<Consumer<FrameBundle>*> consumers_;
     std::thread provider_;
     std::atomic<bool> shutdown_;
     ApplicationContext& app_ctx_;
 
 public:
     explicit FrameProvider(ApplicationContext& app_ctx);
-    void attach(Consumer<rs2::video_frame>* consumer) override;
+    void attach(Consumer<FrameBundle>* consumer) override;
     void start_worker() override;
     void worker() override;
     ~FrameProvider() override;

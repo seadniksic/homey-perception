@@ -11,11 +11,6 @@
 
 #include <thread>
 
-// fwd declare
-namespace rs2 {
-class video_frame;
-}
-
 namespace homey {
 
 /**
@@ -25,7 +20,7 @@ namespace homey {
  * that receives frames from the realsense and runs ML processing
  *
  */
-class MLPipeline : public Consumer<rs2::video_frame>, Manager {
+class MLPipeline : public Consumer<FrameBundle>, Manager {
 
     std::thread pipeline_;
     std::atomic<bool> shutdown_;
@@ -33,7 +28,7 @@ class MLPipeline : public Consumer<rs2::video_frame>, Manager {
 
 public:
     explicit MLPipeline(ApplicationContext& app_ctx);
-    void update(const rs2::video_frame& frame) override;
+    void update(const FrameBundle& frame_bundle) override;
     void start_worker() override;
     void worker() override;
     ~MLPipeline() override;

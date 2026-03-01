@@ -7,10 +7,10 @@
 #include "Types.h"
 
 #include <librealsense2/rs.hpp>
+#include <opencv2/opencv.hpp>
 
 #include <iostream>
 #include <thread>
-#include <chrono>
 #include <random>
 #include <exception>
 
@@ -18,7 +18,7 @@ namespace homey {
 
     FrameProvider::FrameProvider(ApplicationContext& app_ctx) : app_ctx_(app_ctx) {}
 
-    void FrameProvider::attach(Consumer<rs2::video_frame>* consumer) {
+    void FrameProvider::attach(Consumer<FrameBundle>* consumer) {
         consumers_.push_back(consumer);
     };
 
@@ -57,9 +57,27 @@ namespace homey {
 
                 rs2::frameset frames = pipe.wait_for_frames(); // 5 second timeout
                 rs2::video_frame color_frame = frames.get_color_frame();
+                rs2::depth_frame depth_frame = frames.get_depth_frame();
+
+                cv::Mat cv_color_frame(
+                    cv::Size(color_frame.get_width(), color_frame.get_height()),
+                    CV_8UC3,
+                    const_cast<void *>(color_frame.get_data()),
+                    cv::Mat::AUTO_STEP
+                );
+
+                cv::Mat cv_depth_frame(
+                    cv::Size(depth_frame.get_width(), depth_frame.get_height()),
+                    CV_16UC1,
+                    const_cast<void *>(color_frame.get_data())
+                );
+
+                FrameBundle frame_bundle;
+                frame_bundle.color_frame = cv_color_frame;
+                frame_bundle.depth_frame = cv_depth_frame;
 
                 for (const auto& consumer : consumers_) {
-                    consumer->update(color_frame);
+                    consumer->update(frame_bundle);
                 }
             }
 

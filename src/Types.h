@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include <opencv2/core.hpp>
+
 #include <mutex>
 #include <condition_variable>
 #include <queue>
@@ -27,6 +29,11 @@ struct ApplicationContext {
     // render context
     std::queue<std::function<void()>> render_queue; // holds render commands passed by sub threads that
                                                     // want something visualized (must happen in main thread)
+};
+
+struct FrameBundle {
+    cv::Mat color_frame;
+    cv::Mat depth_frame;
 };
 
 }
