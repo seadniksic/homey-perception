@@ -8,7 +8,8 @@ add_executable(homey-perception
         Consumer.h
         VisualizePipeline.cpp
         VisualizePipeline.h
-        types.h
+        Types.h
+        RenderLoop.h
 )
 
 target_link_libraries(homey-perception PRIVATE

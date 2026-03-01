@@ -56,18 +56,6 @@ namespace homey {
                 for (const auto& consumer : consumers_) {
                     consumer->update(color_frame);
                 }
-
-                // rs2::depth_frame depth = frames.get_depth_frame();
-                // rs2::video_frame color = frames.get_color_frame();
-                //
-                // if (!depth || !color) {
-                //     std::cerr << "Missing frame" << std::endl;
-                //     continue;
-                // }
-                //
-                // int w = depth.get_width(), h = depth.get_height();
-                // float dist = depth.get_distance(w/2, h/2);
-                // std::cout << "The camera is facing an object " << dist << " meters away\r" << std::endl;
             }
 
         } catch (const rs2::error& e) {
