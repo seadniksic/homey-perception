@@ -17,15 +17,21 @@ int main() {
         terminate = true;
     });
 
-    homey::RenderContext ctx;
+    try {
+        homey::RenderContext render_ctx;
+        homey::ApplicationContext app_ctx;
 
-    homey::FrameProvider provider;
-    homey::VisualizePipeline viz_pipeline(ctx);
+        homey::FrameProvider provider(app_ctx, render_ctx);
+        homey::VisualizePipeline viz_pipeline(render_ctx);
 
-    provider.attach(&viz_pipeline);
-    provider.start_stream();
+        provider.attach(&viz_pipeline);
+        provider.start_stream();
 
-    render_loop(ctx, terminate);
+        render_loop(app_ctx, render_ctx, terminate);
+        return EXIT_SUCCESS;
 
-    return EXIT_SUCCESS;
+    } catch (const std::exception &e) {
+        std::cout << "Exception thrown: " << e.what() << std::endl;
+        return EXIT_FAILURE;
+    }
 }

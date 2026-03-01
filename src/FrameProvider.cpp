@@ -1,4 +1,5 @@
 #include "FrameProvider.h"
+#include "Types.h"
 
 #include <librealsense2/rs.hpp>
 
@@ -7,6 +8,8 @@
 #include <chrono>
 
 namespace homey {
+
+    FrameProvider::FrameProvider(ApplicationContext& app_ctx, RenderContext& render_ctx) : app_ctx_(app_ctx), render_ctx_(render_ctx) {}
 
     void FrameProvider::attach(Consumer<rs2::video_frame>* consumer) {
         consumers_.push_back(consumer);
@@ -62,6 +65,13 @@ namespace homey {
             std::cerr << "RealSense error: " << e.what() << std::endl;
             std::cerr << "Function: " << e.get_failed_function() << std::endl;
             std::cerr << "Args: " << e.get_failed_args() << std::endl;
+
+            std::unique_lock<std::mutex> lk(app_ctx_.exception_lock);
+            // TODO(sniksic) what is this slicing error?
+            app_ctx_.exception_ptr = std::current_exception();
+            app_ctx_.has_thrown = true;
+            lk.unlock();
+            render_ctx_.frame_available.notify_one();
         }
     }
 
