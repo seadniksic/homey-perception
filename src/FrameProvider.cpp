@@ -1,3 +1,8 @@
+/**
+ * @file    FrameProvider.cpp
+ * @author  Sead Niksic
+ */
+
 #include "FrameProvider.h"
 #include "Types.h"
 
@@ -6,24 +11,25 @@
 #include <iostream>
 #include <thread>
 #include <chrono>
+#include <random>
+#include <exception>
 
 namespace homey {
 
-    FrameProvider::FrameProvider(ApplicationContext& app_ctx, RenderContext& render_ctx) : app_ctx_(app_ctx), render_ctx_(render_ctx) {}
+    FrameProvider::FrameProvider(ApplicationContext& app_ctx) : app_ctx_(app_ctx) {}
 
     void FrameProvider::attach(Consumer<rs2::video_frame>* consumer) {
         consumers_.push_back(consumer);
     };
 
-    void FrameProvider::notify(rs2::video_frame frame) {
-
+    void FrameProvider::start_worker() {
+        provider_ = std::move(std::thread(&FrameProvider::worker, this));
     }
 
-    void FrameProvider::start_stream() {
-        provider_ = std::move(std::thread(&FrameProvider::stream, this));
-    }
-
-    void FrameProvider::stream() {
+    /**
+     * @brief worker thread that pulls frames from realsense and updates consumers
+     */
+    void FrameProvider::worker() {
 
         rs2::context ctx;
         auto devices = ctx.query_devices();
@@ -41,10 +47,6 @@ namespace homey {
         pipe.start(cfg);
 
         try {
-
-            // Explicitly configure the streams you need
-            std::cout << "Starting Pipeline" << std::endl;
-            std::cout << "Pipeline Started" << std::endl;
 
             while (true) {
 
@@ -66,17 +68,15 @@ namespace homey {
             std::cerr << "Function: " << e.get_failed_function() << std::endl;
             std::cerr << "Args: " << e.get_failed_args() << std::endl;
 
-            std::unique_lock<std::mutex> lk(app_ctx_.exception_lock);
-            // TODO(sniksic) what is this slicing error?
+            std::unique_lock<std::mutex> lk(app_ctx_.main_mutex);
             app_ctx_.exception_ptr = std::current_exception();
             app_ctx_.has_thrown = true;
             lk.unlock();
-            render_ctx_.frame_available.notify_one();
+            app_ctx_.main_update.notify_one();
         }
     }
 
     FrameProvider::~FrameProvider() {
-        std::cout << "Destructing frame provider" << std::endl;
         shutdown_ = true;
         provider_.join();
     }

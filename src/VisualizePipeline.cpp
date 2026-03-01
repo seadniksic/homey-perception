@@ -1,15 +1,25 @@
+/**
+ * @file    VisualizePipeline.cpp
+ * @author  Sead Niksic
+ */
+
 #include "VisualizePipeline.h"
 
+#include <librealsense2/hpp/rs_frame.hpp>
 #include <opencv2/opencv.hpp>
 
-#include <iostream>
 #include <mutex>
 
 namespace homey {
 
-VisualizePipeline::VisualizePipeline(RenderContext& render_context) : ctx_(render_context) {}
+VisualizePipeline::VisualizePipeline(ApplicationContext& render_context) : ctx_(render_context) {}
 
-void VisualizePipeline::update(rs2::video_frame frame) {
+/**
+ * @brief Invoked on provider thread and simply passes
+ *        frame & render command to render queue
+ * @param frame The video frame to render
+ */
+void VisualizePipeline::update(const rs2::video_frame& frame) {
 
     cv::Mat cv_frame(
         cv::Size(frame.get_width(), frame.get_height()),
@@ -18,10 +28,10 @@ void VisualizePipeline::update(rs2::video_frame frame) {
         cv::Mat::AUTO_STEP
     );
 
-    std::unique_lock<std::mutex> lk(ctx_.render_lock);
+    std::unique_lock<std::mutex> lk(ctx_.main_mutex);
     ctx_.render_queue.emplace([cv_frame](){cv::imshow("RGB", cv_frame);});
     lk.unlock();
-    ctx_.frame_available.notify_one();
+    ctx_.main_update.notify_one();
 };
 
 }
