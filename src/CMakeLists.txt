@@ -17,4 +17,5 @@ add_executable(homey-perception
 
 target_link_libraries(homey-perception PRIVATE
         ${OpenCV_LIBS}
+        ${TORCH_LIBRARIES}
         realsense2 )
