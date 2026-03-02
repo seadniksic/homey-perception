@@ -5,11 +5,16 @@
 
 #include "MLPipeline.h"
 
+#include <torch/script.h>
+#include <torch/torch.h>
+
 namespace homey {
 
 MLPipeline::MLPipeline(ApplicationContext& app_ctx)
 : app_ctx_(app_ctx) {
    // nn setup
+   // torch::jit::script::Module module = torch::jit::load("");
+   // assert(module != nullptr);
 }
 
 MLPipeline::~MLPipeline() {
